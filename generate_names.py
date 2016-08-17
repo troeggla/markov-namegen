@@ -1,4 +1,4 @@
-""" Generate fictional town names using a Markov chain.
+"""Generate fictional town names using a Markov chain.
 
 This file uses a list of US towns as input, splits each name into syllables and
 uses those to build a Markov chain, which can be used to generate fictional
@@ -21,7 +21,7 @@ import pyphen
 
 
 def split_syllables(name):
-    """ Splits a given string into syllables.
+    """Split a given string into syllables.
 
     This function takes a word, or a sequence of words and splits it into its
     corresponding syllables. The syllables are returned in a list, which each
@@ -41,7 +41,7 @@ def split_syllables(name):
 
 
 def build_markov_chain(names):
-    """ Builds a Markov chain given a list of names.
+    """Build a Markov chain given a list of names.
 
     Takes a list of names, each of which is split into syllables and builds a
     Markov chain from it. The function returns a tuple containing a list of
@@ -49,7 +49,7 @@ def build_markov_chain(names):
     dictionary.
     """
     def append_endmarker(syllables):
-        """ Appends 0 to a list of syllables, marking the end of a name. """
+        """Append 0 to a list of syllables, marking the end of a name."""
         syllables.append(0)
         return syllables
 
@@ -72,7 +72,7 @@ def build_markov_chain(names):
 
 
 def generate_name(start, markov_chain, max_words=2):
-    """ Generates a new town name, given a start syllable and a Markov chain
+    """Generate a new town name, given a start syllable and a Markov chain.
 
     This function takes a single start syllable or a list of start syllables,
     one of which is then chosen randomly, and a corresponding Markov chain to
@@ -116,12 +116,12 @@ def generate_name(start, markov_chain, max_words=2):
 
 
 def name_exists(name, names):
-    """ Check if a given name exists in a set of existing names. """
+    """Check if a given name exists in a set of existing names."""
     return name.lower() in names
 
 
 def main():
-    """ Reads the input file and generates a set of unique fictional names.
+    """Read the input file and generates a set of unique fictional names.
 
     This function is invoked automatically if the script is called from the
     command line. It reads the set of input names from data/cities.json, which
