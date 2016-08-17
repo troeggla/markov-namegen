@@ -29,7 +29,7 @@ def build_markov_chain(names):
     return (start_syllables, markov_chain)
 
 
-def generate_name(start_syllables, markov_chain):
+def generate_name(start_syllables, markov_chain, max_words=2):
     while True:
         next_syllable = random.choice(start_syllables)
         new_name = next_syllable
@@ -44,7 +44,7 @@ def generate_name(start_syllables, markov_chain):
 
         new_name = new_name.strip()
 
-        if len(new_name.split(" ")) < 3:
+        if len(new_name.split(" ")) <= max_words:
             break
 
     new_name = " ".join([word.capitalize() for word in new_name.split(" ")])
