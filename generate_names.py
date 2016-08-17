@@ -40,9 +40,13 @@ def build_markov_chain(names):
     return (start_syllables, markov_chain)
 
 
-def generate_name(start_syllables, markov_chain, max_words=2):
+def generate_name(start, markov_chain, max_words=2):
     while True:
-        next_syllable = random.choice(start_syllables)
+        if isinstance(start, list):
+            next_syllable = random.choice(start)
+        else:
+            next_syllable = start
+
         new_name = next_syllable
 
         while True:
