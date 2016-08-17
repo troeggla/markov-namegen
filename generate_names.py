@@ -57,27 +57,29 @@ def name_exists(name, names):
 
 if __name__ == "__main__":
     num_names = 1
+    input_names = []
 
     if len(sys.argv) >= 2:
         num_names = int(sys.argv[1])
-
-    names = []
 
     with open("cities.json", "r") as f:
         data = json.load(f)
         data = data['results']['bindings']
 
-        names = map(lambda row: row['name']['value'], data)
-        names = map(lambda name: name.split(',')[0].lower(), names)
-        names = map(lambda name: re.sub("[^a-z ]", "", name), names)
+        for row in data:
+            name = row['name']['value']
+            name = name.split(',')[0].lower()
+            name = re.sub("[^a-z ]", "", name)
 
-    start_syllables, markov_chain = build_markov_chain(names)
+            input_names.append(name)
+
+    start_syllables, markov_chain = build_markov_chain(input_names)
     generated_names = set()
 
     while len(generated_names) < num_names:
         new_name = generate_name(start_syllables, markov_chain)
 
-        if not name_exists(new_name, names):
+        if not name_exists(new_name, input_names):
             generated_names.add(new_name)
 
     for name in generated_names:
