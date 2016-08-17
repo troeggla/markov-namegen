@@ -62,7 +62,7 @@ if __name__ == "__main__":
     if len(sys.argv) >= 2:
         num_names = int(sys.argv[1])
 
-    with open("cities.json", "r") as f:
+    with open("data/cities.json", "r") as f:
         data = json.load(f)
         data = data['results']['bindings']
 
