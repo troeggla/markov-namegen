@@ -30,8 +30,11 @@ def split_syllables(name):
     """
     dictionary = pyphen.Pyphen(lang="en")
 
+    # Convert to lower-case and split words
     words = [w + " " for w in name.lower().split(" ")]
+    # Hyphenate words
     syllables = map(dictionary.inserted, words)
+    # Split at hyphenation points and flatten list
     flattened_map = chain(*[w.split("-") for w in syllables])
 
     return list(flattened_map)
@@ -53,14 +56,18 @@ def build_markov_chain(names):
     syllables = map(split_syllables, names)
     syllables = map(append_endmarker, syllables)
 
+    # Get first syllable of each name as start syllable
     start_syllables = [w[0] for w in syllables]
     markov_chain = defaultdict(list)
 
     for name in syllables:
         for i, syllable in enumerate(name):
+            # Check if syllable is not end marker and next syllable is not
+            # already in the chain
             if syllable != 0 and name[i+1] not in markov_chain[syllable]:
                 markov_chain[syllable].append(name[i+1])
 
+    # Return tuple of start syllables and generated Markov chain
     return (start_syllables, markov_chain)
 
 
@@ -78,25 +85,32 @@ def generate_name(start, markov_chain, max_words=2):
     """
     while True:
         if isinstance(start, list):
+            # If start is a list choose a syllable randomly
             next_syllable = random.choice(start)
         else:
             next_syllable = start
 
+        # Initialise new name
         new_name = next_syllable
 
         while True:
+            # Choose next syllable from the Markov chain
             next_syllable = random.choice(markov_chain[next_syllable])
 
+            # Return if end of word has been reached
             if next_syllable == 0:
                 break
             else:
                 new_name += next_syllable
 
+        # Remove leading and trailing spaces
         new_name = new_name.strip()
 
+        # Make sure name has less words than max_words, otherwise start over
         if len(new_name.split(" ")) <= max_words:
             break
 
+    # Capitalise every word in the new name
     new_name = " ".join([word.capitalize() for word in new_name.split(" ")])
     return new_name
 
@@ -122,32 +136,42 @@ def main():
     num_names = 1
     input_names = []
 
+    # Check if a name count has been passed in
     if len(sys.argv) >= 2:
         num_names = int(sys.argv[1])
 
     with open("data/cities.json", "r") as data_file:
+        # Load and parse file
         data = json.load(data_file)
         data = data['results']['bindings']
 
         for row in data:
             name = row['name']['value']
+            # Remove name of US state
             name = name.split(',')[0].lower()
+            # Remove everything which is not a letter or a space
             name = re.sub("[^a-z ]", "", name)
 
             input_names.append(name)
 
+    # Build Markov chain
     start_syllables, markov_chain = build_markov_chain(input_names)
     generated_names = set()
 
+    # Repeat until we have the desired number of names
     while len(generated_names) < num_names:
+        # Generate new name
         new_name = generate_name(start_syllables, markov_chain)
 
+        # Make sure generated name does not exist already
         if not name_exists(new_name, input_names):
             generated_names.add(new_name)
 
+    # Print generated names line by line
     for name in generated_names:
         print name
 
 
 if __name__ == "__main__":
+    # Call main() if script has been launched from the command line
     main()
