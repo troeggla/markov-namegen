@@ -1,5 +1,4 @@
 import json
-import pyphen
 import random
 import re
 import sys
@@ -7,32 +6,31 @@ import sys
 from collections import defaultdict
 from itertools import chain
 
+import pyphen
+
 
 def split_syllables(name):
     dictionary = pyphen.Pyphen(lang="en")
 
-    words = map(lambda w: w + " ", name.lower().split(" "))
-    syllables = map(lambda w: dictionary.inserted(w), words)
-    flattened_map = chain(*map(lambda w: w.split("-"), syllables))
+    words = [w + " " for w in name.lower().split(" ")]
+    syllables = map(dictionary.inserted, words)
+    flattened_map = chain(*[w.split("-") for w in syllables])
 
     return list(flattened_map)
 
 
 def build_markov_chain(names):
-    def append_endmarker(s):
-        s.append(0)
-        return s
+    def append_endmarker(syllables):
+        syllables.append(0)
+        return syllables
 
     syllables = map(split_syllables, names)
     syllables = map(append_endmarker, syllables)
 
-    start_syllables = map(lambda w: w[0], syllables)
+    start_syllables = [w[0] for w in syllables]
     markov_chain = defaultdict(list)
 
     for name in syllables:
-        if len(name) == 2:
-            next
-
         for i, syllable in enumerate(name):
             if syllable != 0 and name[i+1] not in markov_chain[syllable]:
                 markov_chain[syllable].append(name[i+1])
@@ -70,15 +68,15 @@ def name_exists(name, names):
     return name.lower() in names
 
 
-if __name__ == "__main__":
+def main():
     num_names = 1
     input_names = []
 
     if len(sys.argv) >= 2:
         num_names = int(sys.argv[1])
 
-    with open("data/cities.json", "r") as f:
-        data = json.load(f)
+    with open("data/cities.json", "r") as data_file:
+        data = json.load(data_file)
         data = data['results']['bindings']
 
         for row in data:
@@ -99,3 +97,7 @@ if __name__ == "__main__":
 
     for name in generated_names:
         print name
+
+
+if __name__ == "__main__":
+    main()
