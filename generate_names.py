@@ -44,11 +44,15 @@ def generate_name(start_syllables, markov_chain):
 
         new_name = new_name.strip()
 
-        if new_name not in names and len(new_name.split(" ")) < 3:
+        if len(new_name.split(" ")) < 3:
             break
 
     new_name = " ".join([word.capitalize() for word in new_name.split(" ")])
     return new_name
+
+
+def name_exists(name, names):
+    return name.lower() in names
 
 
 if __name__ == "__main__":
@@ -72,7 +76,9 @@ if __name__ == "__main__":
 
     while len(generated_names) < num_names:
         new_name = generate_name(start_syllables, markov_chain)
-        generated_names.add(new_name)
+
+        if not name_exists(new_name, names):
+            generated_names.add(new_name)
 
     for name in generated_names:
         print name
