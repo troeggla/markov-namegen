@@ -1,3 +1,14 @@
+""" Generate fictional town names using a Markov chain.
+
+This file uses a list of US towns as input, splits each name into syllables and
+uses those to build a Markov chain, which can be used to generate fictional
+town names.
+
+Normally, this script should be called from the command line, optionally
+passing in the number of names to be generated. If no arguments are passed to
+the script, a single name is generated.
+"""
+
 import json
 import random
 import re
@@ -10,6 +21,13 @@ import pyphen
 
 
 def split_syllables(name):
+    """ Splits a given string into syllables.
+
+    This function takes a word, or a sequence of words and splits it into its
+    corresponding syllables. The syllables are returned in a list, which each
+    syllable in lowercase. A syllable with a space at the end indicates that
+    this syllable marks the end of a word.
+    """
     dictionary = pyphen.Pyphen(lang="en")
 
     words = [w + " " for w in name.lower().split(" ")]
@@ -20,7 +38,15 @@ def split_syllables(name):
 
 
 def build_markov_chain(names):
+    """ Builds a Markov chain given a list of names.
+
+    Takes a list of names, each of which is split into syllables and builds a
+    Markov chain from it. The function returns a tuple containing a list of
+    syllables which can be used to start new names and the Markov chain as a
+    dictionary.
+    """
     def append_endmarker(syllables):
+        """ Appends 0 to a list of syllables, marking the end of a name. """
         syllables.append(0)
         return syllables
 
@@ -39,6 +65,17 @@ def build_markov_chain(names):
 
 
 def generate_name(start, markov_chain, max_words=2):
+    """ Generates a new town name, given a start syllable and a Markov chain
+
+    This function takes a single start syllable or a list of start syllables,
+    one of which is then chosen randomly, and a corresponding Markov chain to
+    generate a new fictional town name. The number of words in the name can
+    optionally be passed in as an argument and defaults to 2 otherwise.
+
+    Note that it is possible that the generated name already exists. To avoid
+    that, one should check whether the name exists against the set of input
+    names.
+    """
     while True:
         if isinstance(start, list):
             next_syllable = random.choice(start)
@@ -65,10 +102,23 @@ def generate_name(start, markov_chain, max_words=2):
 
 
 def name_exists(name, names):
+    """ Check if a given name exists in a set of existing names. """
     return name.lower() in names
 
 
 def main():
+    """ Reads the input file and generates a set of unique fictional names.
+
+    This function is invoked automatically if the script is called from the
+    command line. It reads the set of input names from data/cities.json, which
+    contains about 9000 city/place names in the US, builds a Markov chain and
+    generates a unique set of unique new names, which are not contained in the
+    input set. The number of names to be generated can be passed in through
+    the command line and defaults to 1 otherwise.
+
+    After successfully generating the specified number of names, they are
+    printed line by line onto the standard output.
+    """
     num_names = 1
     input_names = []
 
