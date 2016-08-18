@@ -33,7 +33,7 @@ def split_syllables(name):
     # Convert to lower-case and split words
     words = [w + " " for w in name.lower().split(" ")]
     # Hyphenate words
-    syllables = map(dictionary.inserted, words)
+    syllables = [dictionary.inserted(word) for word in words]
     # Split at hyphenation points and flatten list
     flattened_map = chain(*[w.split("-") for w in syllables])
 
@@ -53,8 +53,8 @@ def build_markov_chain(names):
         syllables.append(0)
         return syllables
 
-    syllables = map(split_syllables, names)
-    syllables = map(append_endmarker, syllables)
+    syllables = [split_syllables(name) for name in names]
+    syllables = [append_endmarker(name) for name in syllables]
 
     # Get first syllable of each name as start syllable
     start_syllables = [w[0] for w in syllables]
